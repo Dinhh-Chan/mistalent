@@ -81,9 +81,11 @@ export function InterviewInterface({ application, onBack, onComplete, onLogout, 
         setStream(mediaStream)
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream
+          videoRef.current.play().catch(console.error)
         }
       } catch (error) {
         console.error("Error accessing camera:", error)
+        alert("Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập camera và thử lại.")
       }
     }
 
@@ -96,7 +98,7 @@ export function InterviewInterface({ application, onBack, onComplete, onLogout, 
         stream.getTracks().forEach((track) => track.stop())
       }
     }
-  }, [isInterviewStarted, stream])
+  }, [isInterviewStarted])
 
   const handleCompleteInterview = useCallback(() => {
     setShowReview(true)
@@ -321,6 +323,7 @@ export function InterviewInterface({ application, onBack, onComplete, onLogout, 
                         ref={videoRef}
                         autoPlay
                         muted
+                        playsInline
                         className={`w-full h-full object-cover ${!isVideoOn ? "hidden" : ""}`}
                       />
                       {!isVideoOn && (
