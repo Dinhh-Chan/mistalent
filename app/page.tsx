@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Upload, Bot, CheckCircle, FileText, Code, Video, Trophy, MapPin, Clock, DollarSign, Users } from "lucide-react"
 import { LoginPage as LoginPageComponent } from "../components/login-page"
 import { MainDashboard } from "@/components/dashboard/MainDashboard"
+import { AdminDashboard } from "@/components/dashboard/AdminDashboard"
 
 interface Job {
   id: number;
@@ -31,6 +32,7 @@ interface Job {
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [currentStep, setCurrentStep] = useState("home")
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -152,6 +154,26 @@ export default function HomePage() {
     setCurrentStep("apply")
   }
 
+  const handleLogin = (loggedIn: boolean, adminStatus: boolean = false) => {
+    setIsLoggedIn(loggedIn)
+    setIsAdmin(adminStatus)
+    if (loggedIn) {
+      setShowLogin(false)
+      // Nếu có job được chọn, chuyển đến trang nộp CV
+      if (selectedJob) {
+        setCurrentStep("apply")
+      } else {
+        setCurrentStep("home")
+      }
+    }
+  }
+
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    setIsAdmin(false)
+    setCurrentStep("home")
+  }
+
   if (currentStep === "uploading") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
@@ -174,25 +196,18 @@ export default function HomePage() {
   }
 
   if (showLogin) {
-    return <LoginPageComponent onLogin={(loggedIn) => {
-      setIsLoggedIn(loggedIn)
-      if (loggedIn) {
-        setShowLogin(false)
-        // Nếu có job được chọn, chuyển đến trang nộp CV
-        if (selectedJob) {
-          setCurrentStep("apply")
-        } else {
-          setCurrentStep("home")
-        }
-      }
-    }} onBack={() => {
+    return <LoginPageComponent onLogin={handleLogin} onBack={() => {
       setShowLogin(false)
       setSelectedJob(null)
     }} />
   }
 
-  if (isLoggedIn) {
-    return <MainDashboard onLogout={() => setIsLoggedIn(false)} onGoHome={() => setCurrentStep("home")} />
+  if (isLoggedIn && isAdmin) {
+    return <AdminDashboard onLogout={handleLogout} />
+  }
+
+  if (isLoggedIn && !isAdmin) {
+    return <MainDashboard onLogout={handleLogout} onGoHome={() => setCurrentStep("home")} />
   }
 
   if (currentStep === "jobs") {
@@ -213,10 +228,18 @@ export default function HomePage() {
                 <Button variant="ghost" className="bg-blue-50 text-blue-600">
                   Vị trí tuyển dụng
                 </Button>
-                <Button variant="ghost" onClick={() => setShowLogin(true)}>
-                  Đăng nhập
-                </Button>
-                <Button variant="outline">Hỗ trợ</Button>
+                {isLoggedIn ? (
+                  <>
+                    <span className="text-sm text-gray-600">Xin chào, {isAdmin ? 'Admin' : 'User'}</span>
+                    <Button variant="outline" size="sm" onClick={handleLogout}>
+                      Đăng xuất
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="outline" size="sm" onClick={() => setShowLogin(true)}>
+                    Đăng nhập
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -498,10 +521,18 @@ export default function HomePage() {
               <Button variant="ghost" onClick={() => setCurrentStep("jobs")}>
                 Vị trí tuyển dụng
               </Button>
-              <span className="text-sm text-gray-600">Xin chào, {isLoggedIn ? 'User' : 'Guest'}</span>
-              <Button variant="outline" size="sm" onClick={() => setIsLoggedIn(false)}>
-                Đăng xuất
-              </Button>
+              {isLoggedIn ? (
+                <>
+                  <span className="text-sm text-gray-600">Xin chào, {isAdmin ? 'Admin' : 'User'}</span>
+                  <Button variant="outline" size="sm" onClick={handleLogout}>
+                    Đăng xuất
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => setShowLogin(true)}>
+                  Đăng nhập
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -586,10 +617,18 @@ export default function HomePage() {
                   <Button variant="ghost" onClick={() => setCurrentStep("jobs")}>
                     Vị trí tuyển dụng
                   </Button>
-                  <span className="text-sm text-gray-600">Xin chào, {isLoggedIn ? 'User' : 'Guest'}</span>
-                  <Button variant="outline" size="sm" onClick={() => setIsLoggedIn(false)}>
-                    Đăng xuất
-                  </Button>
+                  {isLoggedIn ? (
+                    <>
+                      <span className="text-sm text-gray-600">Xin chào, {isAdmin ? 'Admin' : 'User'}</span>
+                      <Button variant="outline" size="sm" onClick={handleLogout}>
+                        Đăng xuất
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={() => setShowLogin(true)}>
+                      Đăng nhập
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

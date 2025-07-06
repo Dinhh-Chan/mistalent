@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Bot, Eye, EyeOff } from "lucide-react"
 
 interface LoginPageProps {
-  onLogin: (loggedIn: boolean) => void
+  onLogin: (loggedIn: boolean, isAdmin?: boolean) => void
   onBack: () => void
 }
 
@@ -30,7 +30,9 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     if (username === "admin" && password === "admin") {
-      onLogin(true)
+      onLogin(true, true) // Admin login
+    } else if (username === "user" && password === "user") {
+      onLogin(true, false) // Regular user login
     } else {
       setError("Tên đăng nhập hoặc mật khẩu không đúng")
     }
@@ -108,8 +110,6 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
             </form>
-
-            
           </CardContent>
         </Card>
       </div>
